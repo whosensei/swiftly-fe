@@ -2,25 +2,54 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import axios from "axios";
-import { Link2, Loader, Copy, QrCode, MoreVertical, Check ,MousePointerClick} from "lucide-react";
+import { Link2, Loader, Copy, QrCode, MoreVertical, Check, MousePointerClick } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 export function Shorten() {
   const [value, setValue] = useState("");
-  const [oldval,setOldval] = useState("")
+  const [oldval, setOldval] = useState("")
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [remainingUrls, setRemainingUrls] = useState<number | null>(null);
+  const { getToken, isSignedIn } = useAuth();
 
   async function HandleShorten() {
     try {
       setLoading(true);
-      setOldval(value)
-      const response = await axios.post("http://localhost:8080/shorten", { longurl: value });
+      setOldval(value);
+      
+      // Get auth token if user is signed in
+      const token = isSignedIn ? await getToken() : null;
+      
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      
+      const response = await axios.post(
+        "http://localhost:8080/shorten",
+        { longurl: value },
+        // { headers, withCredentials: true }
+      );
+      
       setUrl(response.data.data);
+      
+      // Update remaining URLs count if returned by backend
+      if (response.data.remaining !== undefined) {
+        setRemainingUrls(response.data.remaining);
+      }
+      
       console.log("Shortened URL:", response.data.data);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error shortening URL:", e);
+      if (e.response?.status === 403) {
+        alert(e.response.data.message || "Anonymous users are limited to 5 URLs per 30 minutes. Sign in for unlimited access.");
+      }
     } finally {
       setLoading(false);
     }
@@ -38,6 +67,17 @@ export function Shorten() {
 
   return (
     <div className="w-full max-w-xl px-4 font-mono">
+      {!isSignedIn && remainingUrls !== null && (
+        <div className="mb-3 p-3 bg-muted/50 border border-border rounded-md text-sm text-center">
+          <span className="text-muted-foreground">
+            {remainingUrls} of 5 URLs remaining.{" "}
+          </span>
+          <Link href="/sign-in" className="text-foreground hover:underline">
+            Sign in for unlimited access
+          </Link>
+        </div>
+      )}
+      
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-3 px-4 py-2.5 shadow-lg border border-border rounded-md flex-1">
           <Link2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
