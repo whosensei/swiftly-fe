@@ -8,9 +8,9 @@ export function Navbar() {
   const { isSignedIn, isLoaded } = useUser();
 
   return (
-    <nav className="border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="w-full flex justify-center px-4 py-4">
+      <div className="w-full max-w-3xl border border-border rounded-md bg-background">
+        <div className="flex justify-between items-center h-16 px-4 sm:px-6">
           <Link href="/" className="flex items-center">
             <span className="text-xl font-[family-name:var(--font-instrument-serif)]">
               Swiftly
