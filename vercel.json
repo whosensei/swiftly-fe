@@ -1,0 +1,5 @@
+{
+    "rewrites": [
+      { "source": "/:slug", "destination": "https://swiftly-be-45zyu.ondigitalocean.app/:slug" }
+    ]
+}
