@@ -136,7 +136,7 @@ export function Shorten() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <Link href={item.short} className="text-base font-medium truncate">{item.short.replace('https://', '')}</Link>
+                      <Link href={item.short} target="_blank" rel="noopener noreferrer" className="text-base font-medium truncate">{item.short.replace('https://', '')}</Link>
                       <button
                         onClick={()=>handleCopy(index)}
                         className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
