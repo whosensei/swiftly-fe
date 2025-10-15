@@ -50,11 +50,11 @@ export function Navbar() {
                       Sign in
                     </Button>
                   </SignInButton> */}
-                  <SignInButton mode="modal">
+                  <Link href="/sign-in">
                     <Button size="sm" className="font-mono">
                       Sign In
                     </Button>
-                  </SignInButton>
+                  </Link>
                 </>
               )}
             </div>
