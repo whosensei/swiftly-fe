@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import axios from "axios";
-import { Link2, Loader, Copy, QrCode, MoreVertical, Check, MousePointerClick } from "lucide-react";
+import { Link2, Loader, Copy, QrCode, MoreVertical, Check } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 
@@ -76,10 +76,13 @@ export function Shorten() {
       // Update remaining URLs count if returned by backend
       
       console.log("Shortened URL:", response.data.data);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error shortening URL:", e);
-      if (e.response?.status === 403) {
-        alert(e.response.data.message || "Anonymous users are limited to 5 URLs per 30 minutes. Sign in for unlimited access.");
+      if (e && typeof e === 'object' && 'response' in e) {
+        const axiosError = e as { response?: { status?: number; data?: { message?: string } } };
+        if (axiosError.response?.status === 403) {
+          alert(axiosError.response.data?.message || "Anonymous users are limited to 5 URLs per 30 minutes. Sign in for unlimited access.");
+        }
       }
     } finally {
       setLoading(false);

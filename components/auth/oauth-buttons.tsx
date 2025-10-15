@@ -4,7 +4,7 @@ import * as Clerk from "@clerk/elements/common";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-export function OAuthButtons({ flow }: { flow: "sign-in" | "sign-up" }) {
+export function OAuthButtons() {
   const [showMore, setShowMore] = useState(false);
 
   return (

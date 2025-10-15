@@ -24,7 +24,7 @@ export default function SignInPage() {
             </div>
 
             <div className="space-y-4">
-              <OAuthButtons flow="sign-in" />
+              <OAuthButtons />
               
               <Divider />
 

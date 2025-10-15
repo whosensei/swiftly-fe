@@ -4,7 +4,6 @@ import * as Clerk from "@clerk/elements/common";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 
 export function EmailField() {
   return (
@@ -88,18 +87,9 @@ export function PasswordFieldWithValidation() {
         </button>
       </div>
       <Clerk.FieldError className="text-xs text-destructive" />
-      <Clerk.FieldState>
-        {({ state }) => {
-          if (state === "invalid") {
-            return (
-              <p className="text-xs text-muted-foreground">
-                Password must be at least 8 characters
-              </p>
-            );
-          }
-          return null;
-        }}
-      </Clerk.FieldState>
+      <p className="text-xs text-muted-foreground">
+        Password must be at least 8 characters
+      </p>
     </Clerk.Field>
   );
 }
