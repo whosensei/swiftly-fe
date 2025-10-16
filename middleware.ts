@@ -7,12 +7,21 @@ export async function middleware(request: NextRequest) {
   }
 
   const sessionCookie = getSessionCookie(request);
+  const path = request.nextUrl.pathname;
 
   // Public routes that don't require authentication
-  const isPublicRoute = 
-    request.nextUrl.pathname === "/" ||
-    request.nextUrl.pathname.startsWith("/sign-in") ||
-    request.nextUrl.pathname.startsWith("/sign-up");
+  // Allow single-segment short links like /abc123 while excluding reserved paths
+  const isShortLinkPath =
+    /^\/[A-Za-z0-9_-]+$/.test(path) &&
+    !["/sign-in", "/sign-up", "/dashboard"].includes(path) &&
+    !path.startsWith("/api") &&
+    !path.startsWith("/_next");
+
+  const isPublicRoute =
+    path === "/" ||
+    path.startsWith("/sign-in") ||
+    path.startsWith("/sign-up") ||
+    isShortLinkPath;
 
   // If the route is not public and there's no session, redirect to sign-in
   if (!isPublicRoute && !sessionCookie) {

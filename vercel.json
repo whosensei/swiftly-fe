@@ -1,5 +1,8 @@
 {
     "rewrites": [
-      { "source": "/:slug", "destination": "https://swiftly-be-45zyu.ondigitalocean.app/:slug" }
+      {
+        "source": "/:slug((?!sign-in|sign-up|dashboard|api|_next|favicon\\.ico).+)",
+        "destination": "https://swiftly-be-45zyu.ondigitalocean.app/:slug"
+      }
     ]
 }
