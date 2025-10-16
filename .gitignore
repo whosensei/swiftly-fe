@@ -44,3 +44,10 @@ next-env.d.ts
 /.clerk/
 
 /.cursor/plans
+/AUTHENTICATION.md 
+/llms.md
+
+# database files (contain sensitive user data)
+*.db
+*.sqlite
+*.sqlite3

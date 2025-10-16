@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import axios from "axios";
 import { Link2, Loader, Copy, QrCode, MoreVertical, Check } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/lib/auth-client";
 
 
 interface urls {
@@ -20,7 +20,7 @@ export function Shorten() {
   const [loading, setLoading] = useState(false);
   const [remainingUrls, setRemainingUrls] = useState<number>(5);
   const [copied,setCopied] = useState<number|null>()
-  const { getToken, isSignedIn } = useAuth();
+  const { data: session } = authClient.useSession();
 
   useEffect(()=>{
     const storedurls = localStorage.getItem("anonurls");
@@ -42,7 +42,8 @@ export function Shorten() {
       setLoading(true);
       
       // Get auth token if user is signed in
-      const token = isSignedIn ? await getToken() : null;
+      const isSignedIn = !!session?.user;
+      const token = isSignedIn && session?.session ? session.session.token : null;
       
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -57,7 +58,7 @@ export function Shorten() {
       const response = await axios.post(
         destnurl,
         { longurl: value },
-        // { headers, withCredentials: true }
+        { headers, withCredentials: true }
       );
       
       setUrl(response.data.data);

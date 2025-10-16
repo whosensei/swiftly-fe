@@ -1,19 +1,114 @@
 "use client";
 
-import * as Clerk from "@clerk/elements/common";
-import * as SignIn from "@clerk/elements/sign-in";
 import { Button } from "@/components/ui/button";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { Divider } from "@/components/auth/divider";
 import { EmailField, PasswordField } from "@/components/auth/form-fields";
 import Link from "next/link";
+import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+
+type Step = "start" | "forgot-password" | "reset-password";
 
 export default function SignInPage() {
+  const router = useRouter();
+  const [step, setStep] = useState<Step>("start");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const result = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+      }, {
+        onError: (ctx) => {
+          setError(ctx.error.message || "Failed to sign in");
+        },
+        onSuccess: () => {
+          router.push("/");
+        },
+      });
+      
+      if (result.error) {
+        setError(result.error.message || "Failed to sign in");
+      }
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const result = await authClient.forgetPassword({
+        email,
+        redirectTo: "/sign-in",
+      });
+
+      if (result.error) {
+        setError(result.error.message || "Failed to send reset code");
+      } else {
+        setStep("reset-password");
+      }
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await authClient.resetPassword({
+        newPassword,
+      });
+
+      if (result.error) {
+        setError(result.error.message || "Failed to reset password");
+      } else {
+        router.push("/");
+      }
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <SignIn.Root>
-          <SignIn.Step name="start" className="space-y-6">
+        {step === "start" && (
+          <div className="space-y-6">
             <div className="space-y-2 text-center">
               <h1 className="text-3xl font-normal font-[family-name:var(--font-instrument-serif)]">
                 Welcome to Swiftly
@@ -28,26 +123,31 @@ export default function SignInPage() {
               
               <Divider />
 
-              <Clerk.GlobalError className="text-xs text-destructive text-center" />
+              {error && (
+                <div className="text-xs text-destructive text-center">{error}</div>
+              )}
 
-              <form className="space-y-4">
-                <EmailField />
-                <PasswordField />
+              <form className="space-y-4" onSubmit={handleSignIn}>
+                <EmailField value={email} onChange={setEmail} />
+                <PasswordField value={password} onChange={setPassword} />
 
                 <div className="flex items-center justify-between text-sm">
-                  <SignIn.Action navigate="forgot-password" asChild>
-                    <button
-                      type="button"
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      Forgot password?
-                    </button>
-                  </SignIn.Action>
+                  <button
+                    type="button"
+                    onClick={() => setStep("forgot-password")}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
 
-                <SignIn.Action submit asChild>
-                  <Button className="w-full font-mono">Sign in</Button>
-                </SignIn.Action>
+                <Button 
+                  className="w-full font-mono" 
+                  type="submit" 
+                  disabled={loading}
+                >
+                  {loading ? "Signing in..." : "Sign in"}
+                </Button>
               </form>
             </div>
 
@@ -60,119 +160,87 @@ export default function SignInPage() {
                 Sign up
               </Link>
             </p>
-          </SignIn.Step>
+          </div>
+        )}
 
-          <SignIn.Step name="verifications" className="space-y-6">
-            <div className="space-y-2 text-center">
-              <h1 className="text-3xl font-normal font-[family-name:var(--font-instrument-serif)]">
-                Verify your email
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Check your email for a verification code
-              </p>
-            </div>
-
-            <SignIn.Strategy name="email_code">
-              <form className="space-y-4">
-                <Clerk.Field name="code" className="space-y-2">
-                  <Clerk.Label className="text-sm font-medium text-foreground">
-                    Verification code
-                  </Clerk.Label>
-                  <Clerk.Input
-                    type="text"
-                    className="flex items-center gap-3 px-4 py-2.5 shadow-lg border border-border rounded-md w-full bg-transparent outline-none text-sm font-mono"
-                    placeholder="Enter code"
-                  />
-                  <Clerk.FieldError className="text-xs text-destructive" />
-                </Clerk.Field>
-
-                <SignIn.Action submit asChild>
-                  <Button className="w-full font-mono">Verify</Button>
-                </SignIn.Action>
-              </form>
-            </SignIn.Strategy>
-
-            <SignIn.Action navigate="start" asChild>
-              <button
-                type="button"
-                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                ← Back to sign in
-              </button>
-            </SignIn.Action>
-          </SignIn.Step>
-
-          <SignIn.Step name="forgot-password" className="space-y-6">
+        {step === "forgot-password" && (
+          <div className="space-y-6">
             <div className="space-y-2 text-center">
               <h1 className="text-3xl font-normal font-[family-name:var(--font-instrument-serif)]">
                 Reset password
               </h1>
               <p className="text-sm text-muted-foreground">
-                Enter your email to receive a reset code
+                Enter your email to receive a reset link
               </p>
             </div>
 
-            <form className="space-y-4">
-              <EmailField />
+            {error && (
+              <div className="text-xs text-destructive text-center">{error}</div>
+            )}
 
-              <SignIn.Action submit asChild>
-                <Button className="w-full font-mono">Send reset code</Button>
-              </SignIn.Action>
+            <form className="space-y-4" onSubmit={handleForgotPassword}>
+              <EmailField value={email} onChange={setEmail} />
+
+              <Button 
+                className="w-full font-mono" 
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send reset link"}
+              </Button>
             </form>
 
-            <SignIn.Action navigate="start" asChild>
-              <button
-                type="button"
-                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                ← Back to sign in
-              </button>
-            </SignIn.Action>
-          </SignIn.Step>
+            <button
+              type="button"
+              onClick={() => setStep("start")}
+              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Back to sign in
+            </button>
+          </div>
+        )}
 
-          <SignIn.Step name="reset-password" className="space-y-6">
+        {step === "reset-password" && (
+          <div className="space-y-6">
             <div className="space-y-2 text-center">
               <h1 className="text-3xl font-normal font-[family-name:var(--font-instrument-serif)]">
                 Create new password
               </h1>
               <p className="text-sm text-muted-foreground">
-                Enter the code and your new password
+                Enter your new password
               </p>
             </div>
 
-            <form className="space-y-4">
-              <Clerk.Field name="code" className="space-y-2">
-                <Clerk.Label className="text-sm font-medium text-foreground">
-                  Reset code
-                </Clerk.Label>
-                <Clerk.Input
-                  type="text"
-                  className="flex items-center gap-3 px-4 py-2.5 shadow-lg border border-border rounded-md w-full bg-transparent outline-none text-sm font-mono"
-                  placeholder="Enter code"
-                />
-                <Clerk.FieldError className="text-xs text-destructive" />
-              </Clerk.Field>
+            {error && (
+              <div className="text-xs text-destructive text-center">{error}</div>
+            )}
 
-              <PasswordField />
+            <form className="space-y-4" onSubmit={handleResetPassword}>
+              <PasswordField value={newPassword} onChange={setNewPassword} />
 
-              <Clerk.Field name="confirmPassword" className="space-y-2">
-                <Clerk.Label className="text-sm font-medium text-foreground">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
                   Confirm password
-                </Clerk.Label>
-                <Clerk.Input
+                </label>
+                <input
                   type="password"
                   className="flex items-center gap-3 px-4 py-2.5 shadow-lg border border-border rounded-md w-full bg-transparent outline-none text-sm font-mono"
                   placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                <Clerk.FieldError className="text-xs text-destructive" />
-              </Clerk.Field>
+              </div>
 
-              <SignIn.Action submit asChild>
-                <Button className="w-full font-mono">Reset password</Button>
-              </SignIn.Action>
+              <Button 
+                className="w-full font-mono" 
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Resetting..." : "Reset password"}
+              </Button>
             </form>
-          </SignIn.Step>
-        </SignIn.Root>
+          </div>
+        )}
 
         <div className="mt-8 text-center text-xs text-muted-foreground">
           By signing in you agree to our{" "}
@@ -188,4 +256,3 @@ export default function SignInPage() {
     </div>
   );
 }
-

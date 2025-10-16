@@ -1,18 +1,20 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/lib/auth-client";
 import { useEffect, useRef } from "react";
 import axios from "axios";
 
 export function useAuthSync() {
-  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { data: session, isPending } = authClient.useSession();
   const previousSignedInState = useRef<boolean | null>(null);
   const hasSynced = useRef(false);
 
   useEffect(() => {
     async function syncAnonymousUrls() {
       // Wait for auth to load
-      if (!isLoaded) return;
+      if (isPending) return;
+
+      const isSignedIn = !!session?.user;
 
       // Detect transition from anonymous to signed in
       if (
@@ -22,15 +24,17 @@ export function useAuthSync() {
       ) {
         try {
           hasSynced.current = true;
-          const token = await getToken();
-
-          if (token) {
+          
+          // Get the session token
+          const sessionData = await authClient.getSession();
+          
+          if (sessionData.data?.session) {
             const response = await axios.post(
-              "http://localhost:8080/api/urls/flush",
+              `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"}/api/urls/flush`,
               {},
               {
                 headers: {
-                  Authorization: `Bearer ${token}`,
+                  Authorization: `Bearer ${sessionData.data.session.token}`,
                 },
                 withCredentials: true,
               }
@@ -52,6 +56,5 @@ export function useAuthSync() {
     }
 
     syncAnonymousUrls();
-  }, [isSignedIn, isLoaded, getToken]);
+  }, [session, isPending]);
 }
-

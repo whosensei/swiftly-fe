@@ -1,50 +1,65 @@
 "use client";
 
-import * as Clerk from "@clerk/elements/common";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
-export function EmailField() {
+interface FieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}
+
+export function EmailField({ value, onChange, error }: FieldProps) {
   return (
-    <Clerk.Field name="identifier" className="space-y-2">
-      <Clerk.Label className="text-sm font-medium text-foreground">
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">
         Email address
-      </Clerk.Label>
-      <Clerk.Input type="email" asChild>
-        <Input placeholder="Enter your email" className="font-mono" />
-      </Clerk.Input>
-      <Clerk.FieldError className="text-xs text-destructive" />
-    </Clerk.Field>
+      </label>
+      <Input
+        type="email"
+        placeholder="Enter your email"
+        className="font-mono"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
   );
 }
 
-export function EmailFieldSignUp() {
+export function EmailFieldSignUp({ value, onChange, error }: FieldProps) {
   return (
-    <Clerk.Field name="emailAddress" className="space-y-2">
-      <Clerk.Label className="text-sm font-medium text-foreground">
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">
         Email address
-      </Clerk.Label>
-      <Clerk.Input type="email" asChild>
-        <Input placeholder="Enter your email" className="font-mono" />
-      </Clerk.Input>
-      <Clerk.FieldError className="text-xs text-destructive" />
-    </Clerk.Field>
+      </label>
+      <Input
+        type="email"
+        placeholder="Enter your email"
+        className="font-mono"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
   );
 }
 
-export function PasswordField() {
+export function PasswordField({ value, onChange, error }: FieldProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Clerk.Field name="password" className="space-y-2">
-      <Clerk.Label className="text-sm font-medium text-foreground">
-        Password
-      </Clerk.Label>
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">Password</label>
       <div className="relative">
-        <Clerk.Input type={showPassword ? "text" : "password"} asChild>
-          <Input placeholder="Enter your password" className="font-mono pr-10" />
-        </Clerk.Input>
+        <Input
+          type={showPassword ? "text" : "password"}
+          placeholder="Enter your password"
+          className="font-mono pr-10"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
@@ -57,23 +72,25 @@ export function PasswordField() {
           )}
         </button>
       </div>
-      <Clerk.FieldError className="text-xs text-destructive" />
-    </Clerk.Field>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
   );
 }
 
-export function PasswordFieldWithValidation() {
+export function PasswordFieldWithValidation({ value, onChange, error }: FieldProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Clerk.Field name="password" className="space-y-2">
-      <Clerk.Label className="text-sm font-medium text-foreground">
-        Password
-      </Clerk.Label>
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">Password</label>
       <div className="relative">
-        <Clerk.Input type={showPassword ? "text" : "password"} asChild>
-          <Input placeholder="Create a password" className="font-mono pr-10" />
-        </Clerk.Input>
+        <Input
+          type={showPassword ? "text" : "password"}
+          placeholder="Create a password"
+          className="font-mono pr-10"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
@@ -86,25 +103,51 @@ export function PasswordFieldWithValidation() {
           )}
         </button>
       </div>
-      <Clerk.FieldError className="text-xs text-destructive" />
+      {error && <p className="text-xs text-destructive">{error}</p>}
       <p className="text-xs text-muted-foreground">
         Password must be at least 8 characters
       </p>
-    </Clerk.Field>
+    </div>
   );
 }
 
-export function CodeField() {
+export function CodeField({ value, onChange, error }: FieldProps) {
   return (
-    <Clerk.Field name="code" className="space-y-2">
-      <Clerk.Label className="text-sm font-medium text-foreground">
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">
         Verification code
-      </Clerk.Label>
-      <Clerk.Input asChild>
-        <Input placeholder="Enter code" className="font-mono" />
-      </Clerk.Input>
-      <Clerk.FieldError className="text-xs text-destructive" />
-    </Clerk.Field>
+      </label>
+      <Input
+        placeholder="Enter code"
+        className="font-mono"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
   );
 }
 
+interface NameFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}
+
+export function NameField({ value, onChange, error }: NameFieldProps) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">
+        Name (optional)
+      </label>
+      <Input
+        type="text"
+        placeholder="Enter your name"
+        className="font-mono"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}

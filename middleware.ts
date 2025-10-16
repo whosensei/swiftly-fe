@@ -1,16 +1,26 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-]);
-
-export default clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect();
+export async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
   }
-});
+
+  const sessionCookie = getSessionCookie(request);
+
+  // Public routes that don't require authentication
+  const isPublicRoute = 
+    request.nextUrl.pathname === "/" ||
+    request.nextUrl.pathname.startsWith("/sign-in") ||
+    request.nextUrl.pathname.startsWith("/sign-up");
+
+  // If the route is not public and there's no session, redirect to sign-in
+  if (!isPublicRoute && !sessionCookie) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
@@ -20,4 +30,3 @@ export const config = {
     "/(api|trpc)(.*)",
   ],
 };
-
