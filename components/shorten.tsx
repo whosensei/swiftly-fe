@@ -58,7 +58,7 @@ export function Shorten() {
       const response = await axios.post(
         destnurl,
         { longurl: value },
-        { headers, withCredentials: true }
+        // { headers, withCredentials: true }
       );
       
       setUrl(response.data.data);
