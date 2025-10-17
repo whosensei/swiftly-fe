@@ -63,7 +63,8 @@ export function Shorten() {
       
       setUrl(response.data.data);
       setRemainingUrls(remainingUrls=>remainingUrls-1)
-      setAnonurls(prev => [...prev, { short: response.data.data, long: value}])           
+      setAnonurls(prev => [...prev, { short: response.data.data, long: value}])
+      setValue("");  // Clear input after successful shortening
       // Update remaining URLs count if returned by backend
       
       console.log("Shortened URL:", response.data.data);
@@ -82,7 +83,7 @@ export function Shorten() {
 
   async function handleCopy(index : number) {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(anonurls[index].short);
       setCopied(index);
       setTimeout(() => setCopied(null), 2000);
     } catch (e) {
