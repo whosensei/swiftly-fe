@@ -5,6 +5,7 @@ import axios from "axios";
 import { Link2, Loader, Copy, QrCode, MoreVertical, Check } from "lucide-react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { QRCodeDialog } from "./qrcode";
 
 
 interface urls {
@@ -21,6 +22,8 @@ export function Shorten() {
   const [remainingUrls, setRemainingUrls] = useState<number>(5);
   const [copied,setCopied] = useState<number|null>()
   const { data: session } = authClient.useSession();
+  const [showQR, setShowQR] = useState(false);
+  const [selectedQRUrl, setSelectedQRUrl] = useState<string>("");
 
   useEffect(()=>{
     const storedurls = localStorage.getItem("anonurls");
@@ -36,6 +39,11 @@ export function Shorten() {
   useEffect(()=>{
     localStorage.setItem("anonurls",JSON.stringify(anonurls))
   },[anonurls])
+
+  function handleQR(index: number) {
+    setSelectedQRUrl(anonurls[index].short);
+    setShowQR(true);
+  }
 
   async function HandleShorten() {
     try {
@@ -92,7 +100,12 @@ export function Shorten() {
   }
 
   return (
-    <div className="w-full max-w-xl px-4 font-mono">      
+    <div className="w-full max-w-xl px-4 font-mono">
+      <QRCodeDialog 
+        url={selectedQRUrl} 
+        open={showQR} 
+        onOpenChange={setShowQR} 
+      />
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-3 px-4 py-2.5 shadow-lg border border-border rounded-md flex-1">
           <Link2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -143,6 +156,7 @@ export function Shorten() {
                       <button
                         className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
                         aria-label="Show QR Code"
+                        onClick={()=>handleQR(index)}
                       >
                         <QrCode className="w-4 h-4 text-muted-foreground" />
                       </button>
