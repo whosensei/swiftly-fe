@@ -5,6 +5,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession();
@@ -63,10 +64,11 @@ export function Navbar() {
             </Link>
             
             <div className="flex justify-end items-center h-16">
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4">
                 <Link href="#features" className="text-sm font-mono text-muted-foreground hover:text-foreground transition-colors">
                   Features
                 </Link>
+                <ThemeToggle />
                 {isPending ? (
                   <div className="w-20 h-9 bg-muted animate-pulse rounded-md"></div>
                 ) : session?.user ? (
