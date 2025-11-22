@@ -40,6 +40,10 @@ export function Shorten() {
   const [deleteUrl, setDeleteUrl] = useState(false);
   const [selectedQRUrl, setSelectedQRUrl] = useState<string>("");
   const { data: session } = authClient.useSession();
+  const backendBaseUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+  const shortUrlBase =
+    process.env.NEXT_PUBLIC_FRONTEND_URL || backendBaseUrl;
 
   const getAnonymousToken = () => {
     let token = localStorage.getItem("anon_session_token");
@@ -64,12 +68,9 @@ export function Shorten() {
 
   const fetchAnonymousURLs = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/urls/anonymous`,
-        {
-          headers: { "X-Anonymous-Token": getAnonymousToken() },
-        }
-      );
+      const response = await axios.get(`${backendBaseUrl}/urls/anonymous`, {
+        headers: { "X-Anonymous-Token": getAnonymousToken() },
+      });
 
       if (response.data) {
         setUrls(response.data);
@@ -85,12 +86,9 @@ export function Shorten() {
       const jwtToken = await getJWTToken();
       if (!jwtToken) return;
 
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/urls/authenticated`,
-        {
-          headers: { Authorization: `Bearer ${jwtToken}` },
-        }
-      );
+      const response = await axios.get(`${backendBaseUrl}/urls/authenticated`, {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
 
       if (response.data) {
         setUrls(response.data);
@@ -131,7 +129,7 @@ export function Shorten() {
       }
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/shorten`,
+        `${backendBaseUrl}/shorten`,
         { longurl: value },
         { headers }
       );
@@ -180,10 +178,9 @@ export function Shorten() {
       } else {
         headers["X-Anonymous-Token"] = getAnonymousToken();
       }
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/urls/delete/${shortCode}`,
-        { headers }
-      );
+      await axios.delete(`${backendBaseUrl}/urls/delete/${shortCode}`, {
+        headers,
+      });
 
       if (isSignedIn) {
         await fetchAuthenticatedURLs();
@@ -199,9 +196,7 @@ export function Shorten() {
 
   async function handleCopy(shortCode: string, index: number) {
     try {
-      await navigator.clipboard.writeText(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${shortCode}`
-      );
+      await navigator.clipboard.writeText(`${shortUrlBase}/${shortCode}`);
       setCopied(index);
       setTimeout(() => setCopied(null), 2000);
     } catch (e) {
@@ -210,7 +205,7 @@ export function Shorten() {
   }
 
   function handleQR(shortCode: string) {
-    setSelectedQRUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/${shortCode}`);
+    setSelectedQRUrl(`${shortUrlBase}/${shortCode}`);
     setShowQR(true);
   }
 
@@ -263,16 +258,14 @@ export function Shorten() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <Link
-                        href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/${url.short_code}`}
+                        href={`${shortUrlBase}/${url.short_code}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-base font-medium truncate"
                       >
-                        {process.env.NEXT_PUBLIC_BACKEND_URL?.replace(
-                          /^https?:\/\//,
-                          ""
-                        )}
-                        /{url.short_code}
+                        {`${shortUrlBase}/${url.short_code}`
+                          .replace(/^https?:\/\//, "")
+                          .replace(/^http:\/\//, "")}
                       </Link>
                       <button
                         onClick={() => handleCopy(url.short_code, index)}
