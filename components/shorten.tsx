@@ -265,7 +265,8 @@ export function Shorten() {
                       >
                         {`${shortUrlBase}/${url.short_code}`
                           .replace(/^https?:\/\//, "")
-                          .replace(/^http:\/\//, "")}
+                          .replace(/^http:\/\//, "")
+                          .replace(/^www\./, "")}
                       </Link>
                       <button
                         onClick={() => handleCopy(url.short_code, index)}
