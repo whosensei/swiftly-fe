@@ -145,7 +145,7 @@ export function QRCodeDialog({ url, open, onOpenChange }: QRCodeDialogProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 <DropdownMenuItem onClick={handleCopyImage}>
-                  <Image className="w-4 h-4" />
+                  <Image className="w-4 h-4" aria-hidden="true" />
                   Copy Image
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleCopyURL}>

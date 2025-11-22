@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getSession } from "@/lib/server-auth";
@@ -29,7 +29,7 @@ export async function GET() {
   });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   // Validate session
   const session = await getSession()
 

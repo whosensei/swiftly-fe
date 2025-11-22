@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import axios from "axios";
 import {
@@ -62,16 +62,7 @@ export function Shorten() {
     }
   };
 
-  useEffect(() => {
-    const isSignedIn = !!session?.user;
-    if (isSignedIn) {
-      fetchAuthenticatedURLs();
-    } else {
-      fetchAnonymousURLs();
-    }
-  }, [session]);
-
-  async function fetchAnonymousURLs() {
+  const fetchAnonymousURLs = useCallback(async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/urls/anonymous`,
@@ -87,9 +78,9 @@ export function Shorten() {
     } catch (error) {
       console.error("Failed to fetch anonymous URLs:", error);
     }
-  }
+  }, []);
 
-  async function fetchAuthenticatedURLs() {
+  const fetchAuthenticatedURLs = useCallback(async () => {
     try {
       const jwtToken = await getJWTToken();
       if (!jwtToken) return;
@@ -107,7 +98,16 @@ export function Shorten() {
     } catch (error) {
       console.error("Failed to fetch authenticated URLs:", error);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const isSignedIn = !!session?.user;
+    if (isSignedIn) {
+      fetchAuthenticatedURLs();
+    } else {
+      fetchAnonymousURLs();
+    }
+  }, [session, fetchAuthenticatedURLs, fetchAnonymousURLs]);
 
   async function HandleShorten() {
     try {
@@ -155,9 +155,9 @@ export function Shorten() {
       }
 
       setValue("");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error shortening URL:", e);
-      if (e.response?.status === 429) {
+      if (axios.isAxiosError(e) && e.response?.status === 429) {
         alert("Rate limit exceeded. Sign in for unlimited access!");
       }
     } finally {
