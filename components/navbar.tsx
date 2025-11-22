@@ -81,7 +81,7 @@ export function Navbar() {
                     </button>
                     
                     {dropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-64 bg-background border border-border rounded-md shadow-lg py-1 z-50">
+                      <div className="absolute left-0 mt-2 w-64 bg-background border border-border rounded-md shadow-lg py-1 z-50">
                         <div className="px-4 py-3 border-b border-border">
                           <p className="text-sm font-medium">{session.user.name || "User"}</p>
                           <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
