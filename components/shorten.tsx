@@ -263,7 +263,7 @@ export function Shorten() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <Link
-                        href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${url.short_code}`}
+                        href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/${url.short_code}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-base font-medium truncate"
