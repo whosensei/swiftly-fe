@@ -196,7 +196,8 @@ export function Shorten() {
 
   async function handleCopy(shortCode: string, index: number) {
     try {
-      await navigator.clipboard.writeText(`${shortUrlBase}/${shortCode}`);
+      const urlToCopy = `${shortUrlBase}/${shortCode}`.replace(/www\./i, "");
+      await navigator.clipboard.writeText(urlToCopy);
       setCopied(index);
       setTimeout(() => setCopied(null), 2000);
     } catch (e) {
@@ -205,7 +206,8 @@ export function Shorten() {
   }
 
   function handleQR(shortCode: string) {
-    setSelectedQRUrl(`${shortUrlBase}/${shortCode}`);
+    const urlForQR = `${shortUrlBase}/${shortCode}`.replace(/www\./i, "");
+    setSelectedQRUrl(urlForQR);
     setShowQR(true);
   }
 
