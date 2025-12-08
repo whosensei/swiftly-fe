@@ -20,6 +20,12 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    rules: {
+      // Disable for external favicon URLs that can't use Next.js Image
+      "@next/next/no-img-element": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

@@ -87,6 +87,14 @@ export function Navbar() {
                           <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
                         </div>
                         
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setDropdownOpen(false)}
+                          className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"
+                        >
+                          Dashboard
+                        </Link>
+                        
                         <button
                           onClick={handleSignOut}
                           className="w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"

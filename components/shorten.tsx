@@ -30,6 +30,15 @@ interface URL {
   created_at: string;
 }
 
+function getFavicon(url: string) {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  } catch {
+    return null;
+  }
+}
+
 export function Shorten() {
   const [value, setValue] = useState("");
   const [urls, setUrls] = useState<URL[]>([]);
@@ -79,7 +88,7 @@ export function Shorten() {
     } catch (error) {
       console.error("Failed to fetch anonymous URLs:", error);
     }
-  }, []);
+  }, [backendBaseUrl]);
 
   const fetchAuthenticatedURLs = useCallback(async () => {
     try {
@@ -96,7 +105,7 @@ export function Shorten() {
     } catch (error) {
       console.error("Failed to fetch authenticated URLs:", error);
     }
-  }, []);
+  }, [backendBaseUrl]);
 
   useEffect(() => {
     const isSignedIn = !!session?.user;
@@ -254,8 +263,19 @@ export function Shorten() {
             <div className="p-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
-                    <div className="w-4 h-4 rounded-full bg-background"></div>
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {getFavicon(url.long_url) ? (
+                      <img
+                        src={getFavicon(url.long_url)!}
+                        alt=""
+                        className="w-4 h-4"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <Link2 className="w-4 h-4 text-muted-foreground" />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">

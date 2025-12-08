@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, Copy, Image, Link, Check } from 'lucide-react';
+import { Download, Copy, Image as ImageIcon, Link, Check } from 'lucide-react';
 import { 
   Dialog, 
   DialogContent, 
@@ -145,7 +145,7 @@ export function QRCodeDialog({ url, open, onOpenChange }: QRCodeDialogProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 <DropdownMenuItem onClick={handleCopyImage}>
-                  <Image className="w-4 h-4" aria-hidden="true" />
+                  <ImageIcon className="w-4 h-4" />
                   Copy Image
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleCopyURL}>
