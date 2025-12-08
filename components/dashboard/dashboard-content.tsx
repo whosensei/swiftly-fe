@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { Loader } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import {
@@ -165,9 +166,9 @@ export function DashboardContent() {
           <div className="h-16 px-5 flex items-center">
             <Link href="/" className="flex items-center gap-3">
               <div className="w-9 h-9 bg-foreground rounded-lg flex items-center justify-center">
-                <span className="text-background text-sm font-bold">S</span>
+                <Loader className="text-background text-sm font-bold" />
               </div>
-              <span className="font-semibold text-base">Short Links</span>
+              <span className="font-semibold text-base">Swiftly</span>
             </Link>
           </div>
 

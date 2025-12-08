@@ -58,7 +58,7 @@ export function Navbar() {
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
-              <span className="text-xl font-[family-name:var(--font-instrument-serif)]">
+              <span className="text-xl text-primary font-[family-name:var(--font-instrument-serif)]">
                 Swiftly
               </span>
             </Link>
