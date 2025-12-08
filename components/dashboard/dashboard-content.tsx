@@ -341,12 +341,12 @@ export function DashboardContent() {
                       {/* Left: Favicon + Link Info */}
                       <div className="flex items-center gap-4 min-w-0 flex-1">
                         {/* Favicon */}
-                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div className="w-12 h-12 rounded-full bg-muted dark:bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {getFavicon(url.long_url) ? (
                             <img
                               src={getFavicon(url.long_url)!}
                               alt=""
-                              className="w-6 h-6"
+                              className="w-6 h-6 dark:brightness-90 dark:contrast-125"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = "none";
                               }}
@@ -486,12 +486,12 @@ export function DashboardContent() {
                           >
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <div className="w-8 h-8 rounded-full bg-muted dark:bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                                   {getFavicon(url.long_url) ? (
                                     <img
                                       src={getFavicon(url.long_url)!}
                                       alt=""
-                                      className="w-4 h-4"
+                                      className="w-4 h-4 dark:brightness-90 dark:contrast-125"
                                       onError={(e) => {
                                         (e.target as HTMLImageElement).style.display = "none";
                                       }}

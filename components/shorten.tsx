@@ -263,12 +263,12 @@ export function Shorten() {
             <div className="p-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <div className="w-8 h-8 rounded-full bg-muted dark:bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {getFavicon(url.long_url) ? (
                       <img
                         src={getFavicon(url.long_url)!}
                         alt=""
-                        className="w-4 h-4"
+                        className="w-4 h-4 dark:brightness-90 dark:contrast-125"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = "none";
                         }}
