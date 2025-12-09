@@ -68,6 +68,11 @@ export function Navbar() {
                 <Link href="#features" className="text-sm font-mono text-muted-foreground hover:text-foreground transition-colors">
                   Features
                 </Link>
+                {session?.user && (
+                  <Link href="/dashboard" className="text-sm font-mono text-muted-foreground hover:text-foreground transition-colors">
+                    Dashboard
+                  </Link>
+                )}
                 <ThemeToggle />
                 {isPending ? (
                   <div className="w-20 h-9 bg-muted animate-pulse rounded-md"></div>
@@ -87,13 +92,13 @@ export function Navbar() {
                           <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
                         </div>
                         
-                        <Link
+                        {/* <Link
                           href="/dashboard"
                           onClick={() => setDropdownOpen(false)}
                           className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"
                         >
                           Dashboard
-                        </Link>
+                        </Link> */}
                         
                         <button
                           onClick={handleSignOut}
