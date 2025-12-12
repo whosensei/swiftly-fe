@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { QRCodeDialog } from "@/components/qrcode";
+import { AnalyticsSheet } from "@/components/dashboard/analytics-sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +50,8 @@ export function DashboardContent() {
   const [selectedQRUrl, setSelectedQRUrl] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"card" | "table">("card");
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [selectedAnalyticsUrl, setSelectedAnalyticsUrl] = useState<URL | null>(null);
   const { data: session } = authClient.useSession();
 
   const backendBaseUrl =
@@ -127,6 +130,11 @@ export function DashboardContent() {
     setShowQR(true);
   }
 
+  function handleOpenAnalytics(url: URL) {
+    setSelectedAnalyticsUrl(url);
+    setShowAnalytics(true);
+  }
+
   function formatDate(dateString: string) {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -157,6 +165,11 @@ export function DashboardContent() {
         url={selectedQRUrl}
         open={showQR}
         onOpenChange={setShowQR}
+      />
+      <AnalyticsSheet
+        url={selectedAnalyticsUrl}
+        open={showAnalytics}
+        onOpenChange={setShowAnalytics}
       />
 
       <div className="flex gap-3 h-[calc(100vh-24px)]">
@@ -334,6 +347,19 @@ export function DashboardContent() {
                   {filteredUrls.map((url) => (
                     <div
                       key={url.short_code}
+                      onClick={(e) => {
+                        // Don't open analytics if clicking on interactive elements
+                        const target = e.target as HTMLElement;
+                        if (
+                          target.closest('button') ||
+                          target.closest('a') ||
+                          target.closest('[role="menuitem"]') ||
+                          target.closest('[data-radix-dropdown-menu-trigger]')
+                        ) {
+                          return;
+                        }
+                        handleOpenAnalytics(url);
+                      }}
                       className="flex items-center p-5 border border-border rounded-lg bg-card cursor-pointer
                         hover:border-foreground/30 hover:shadow-md hover:-translate-y-0.5 
                         transition-all duration-200 ease-out group"
@@ -435,6 +461,12 @@ export function DashboardContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
+                              onClick={() => handleOpenAnalytics(url)}
+                            >
+                              <BarChart3 className="w-4 h-4" />
+                              View Analytics
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                               onClick={() => handleCopy(url.short_code)}
                             >
                               <Copy className="w-4 h-4" />
@@ -452,7 +484,10 @@ export function DashboardContent() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               variant="destructive"
-                              onClick={() => deleteUrl(url.short_code)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteUrl(url.short_code);
+                              }}
                               disabled={deleteLoading === url.short_code}
                             >
                               <Trash2 className="w-4 h-4" />
@@ -482,7 +517,20 @@ export function DashboardContent() {
                         {filteredUrls.map((url) => (
                           <tr 
                             key={url.short_code}
-                            className="hover:bg-muted/30 transition-colors group"
+                            onClick={(e) => {
+                              // Don't open analytics if clicking on interactive elements
+                              const target = e.target as HTMLElement;
+                              if (
+                                target.closest('button') ||
+                                target.closest('a') ||
+                                target.closest('[role="menuitem"]') ||
+                                target.closest('[data-radix-dropdown-menu-trigger]')
+                              ) {
+                                return;
+                              }
+                              handleOpenAnalytics(url);
+                            }}
+                            className="hover:bg-muted/30 transition-colors group cursor-pointer"
                           >
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
@@ -562,6 +610,12 @@ export function DashboardContent() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuItem
+                                      onClick={() => handleOpenAnalytics(url)}
+                                    >
+                                      <BarChart3 className="w-4 h-4" />
+                                      View Analytics
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
                                       onClick={() => handleCopy(url.short_code)}
                                     >
                                       <Copy className="w-4 h-4" />
@@ -579,7 +633,10 @@ export function DashboardContent() {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                       variant="destructive"
-                                      onClick={() => deleteUrl(url.short_code)}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteUrl(url.short_code);
+                                      }}
                                       disabled={deleteLoading === url.short_code}
                                     >
                                       <Trash2 className="w-4 h-4" />
