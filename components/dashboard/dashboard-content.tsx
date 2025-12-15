@@ -16,16 +16,26 @@ import {
   Search,
   Filter,
   LayoutGrid,
-  ChevronDown,
   BarChart3,
   Tag,
   Plus,
   Table,
+  Pencil,
+  Share2,
+  User,
+  Moon,
+  Sun,
+  ChevronsUpDown,
+  LogOut,
+  Settings,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { authClient } from "@/lib/auth-client";
 import { QRCodeDialog } from "@/components/qrcode";
 import { AnalyticsSheet } from "@/components/dashboard/analytics-sheet";
+import { CreateLinkDialog } from "@/components/dashboard/create-link-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +62,7 @@ export function DashboardContent() {
   const [viewMode, setViewMode] = useState<"card" | "table">("card");
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [selectedAnalyticsUrl, setSelectedAnalyticsUrl] = useState<URL | null>(null);
+  const [showCreateLink, setShowCreateLink] = useState(false);
   const { data: session } = authClient.useSession();
 
   const backendBaseUrl =
@@ -160,7 +171,7 @@ export function DashboardContent() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/30 p-3 font-mono">
+    <div className="min-h-screen bg-muted/40 dark:bg-[#0a0a0a] font-mono">
       <QRCodeDialog
         url={selectedQRUrl}
         open={showQR}
@@ -171,111 +182,147 @@ export function DashboardContent() {
         open={showAnalytics}
         onOpenChange={setShowAnalytics}
       />
+      <CreateLinkDialog
+        open={showCreateLink}
+        onOpenChange={setShowCreateLink}
+        onSuccess={fetchAuthenticatedURLs}
+      />
 
-      <div className="flex gap-3 h-[calc(100vh-24px)]">
+      <div className="flex h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-card rounded-lg border border-border flex flex-col overflow-hidden">
+        <aside className="w-56 bg-background dark:bg-[#0a0a0a] border-r border-border/50 dark:border-white/[0.08] flex flex-col">
           {/* Logo */}
-          <div className="h-16 px-5 flex items-center">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-foreground rounded-lg flex items-center justify-center">
-                <Loader className="text-background text-sm font-bold" />
+          <div className="h-14 px-4 flex items-center border-b border-border/50 dark:border-white/[0.08]">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-7 h-7 bg-foreground rounded-md flex items-center justify-center">
+                <Loader className="w-4 h-4 text-background" />
               </div>
-              <span className="font-semibold text-base">Swiftly</span>
+              <span className="font-semibold text-sm tracking-tight">Swiftly</span>
             </Link>
           </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="space-y-1">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 px-4 py-2.5 text-base bg-accent text-accent-foreground rounded-md"
-            >
-              <Link2 className="w-5 h-5" />
-              Links
-            </Link>
-          </div>
-
-          {/* Insights Section */}
-          <div className="mt-8">
-            <p className="px-4 text-sm text-muted-foreground font-medium mb-3">
-              Insights
-            </p>
-            <div className="space-y-1">
+          {/* Navigation */}
+          <nav className="flex-1 px-3 py-4">
+            <div className="space-y-0.5">
               <Link
-                href="#"
-                className="flex items-center gap-3 px-4 py-2.5 text-base text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors"
+                href="/dashboard"
+                className="flex items-center gap-2.5 px-3 py-2 text-sm bg-foreground/[0.06] dark:bg-white/[0.08] text-foreground rounded-md font-medium"
               >
-                <BarChart3 className="w-5 h-5" />
-                Analytics
+                <Link2 className="w-4 h-4" />
+                Links
               </Link>
             </div>
-          </div>
 
-          {/* Library Section */}
-          <div className="mt-8">
-            <p className="px-4 text-sm text-muted-foreground font-medium mb-3">
-              Library
-            </p>
-            <div className="space-y-1">
-              <Link
-                href="#"
-                className="flex items-center gap-3 px-4 py-2.5 text-base text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors"
-              >
-                <Tag className="w-5 h-5" />
-                Tags
-              </Link>
-            </div>
-          </div>
-        </nav>
-
-          {/* Bottom Section */}
-          <div className="p-4 mt-auto">
-            <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-4">
-              <p className="mb-2 font-medium">Usage</p>
-              <div className="flex items-center justify-between">
-                <span>Links</span>
-                <span className="font-semibold text-foreground">{urls.length}</span>
+            {/* Library Section */}
+            <div className="mt-6">
+              <p className="px-3 text-[11px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-2">
+                Library
+              </p>
+              <div className="space-y-0.5">
+                <div
+                  className="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground cursor-not-allowed"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Tag className="w-4 h-4" />
+                    Tags
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 bg-foreground/[0.06] dark:bg-white/[0.06] rounded text-muted-foreground/70 font-medium">
+                    Soon
+                  </span>
+                </div>
               </div>
             </div>
+          </nav>
+
+          {/* User Profile Section */}
+          <div className="p-2 border-t border-border/50 dark:border-white/[0.08]">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-full flex items-center gap-2.5 p-2 rounded-md hover:bg-foreground/[0.04] dark:hover:bg-white/[0.04] transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-foreground/[0.08] dark:bg-white/[0.08] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {session?.user?.image ? (
+                      <img 
+                        src={session.user.image} 
+                        alt="" 
+                        className="w-8 h-8 rounded-full"
+                      />
+                    ) : (
+                      <User className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="text-xs font-medium truncate">
+                      {session?.user?.name || 'User'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      {session?.user?.email || ''}
+                    </p>
+                  </div>
+                  <ChevronsUpDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start" className="w-[200px]">
+                <div className="px-2 py-1.5 border-b border-border mb-1">
+                  <p className="text-sm font-medium">{session?.user?.name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground">{session?.user?.email || ''}</p>
+                </div>
+                <DropdownMenuItem>
+                  <User className="w-4 h-4" />
+                  Account
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <CreditCard className="w-4 h-4" />
+                  Billing
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </DropdownMenuItem>
+                <div className="border-t border-border mt-1 pt-1">
+                  <DropdownMenuItem 
+                    onClick={() => authClient.signOut()}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 bg-card rounded-lg border border-border flex flex-col overflow-hidden">
+        <main className="flex-1 bg-background dark:bg-[#0f0f0f] flex flex-col overflow-hidden">
           {/* Header */}
-          <header className="h-16 flex items-center justify-between px-8">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold">Links</h1>
-              <ChevronDown className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <Link href="/">
-              <Button size="default" className="gap-2">
-                Create link
-                <Plus className="w-4 h-4" />
-              </Button>
-            </Link>
+          <header className="h-14 flex items-center justify-between px-6 border-b border-border/50 dark:border-white/[0.08]">
+            <h1 className="text-base font-semibold">All Links</h1>
+            <Button 
+              size="sm" 
+              className="gap-1.5 h-8 text-xs"
+              onClick={() => setShowCreateLink(true)}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Create link
+            </Button>
           </header>
 
           {/* Filter Bar */}
-          <div className="flex items-center justify-between px-8 py-6 border-t border-border">
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="default" className="gap-2">
-                <Filter className="w-4 h-4" />
+          <div className="flex items-center justify-between px-6 py-3 border-b border-border/50 dark:border-white/[0.08] bg-muted/30 dark:bg-white/[0.02]">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs border-border/60 dark:border-white/[0.1]">
+                <Filter className="w-3.5 h-3.5" />
                 Filter
-                <ChevronDown className="w-4 h-4" />
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="default" className="gap-2">
+                  <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs border-border/60 dark:border-white/[0.1]">
                     {viewMode === "card" ? (
-                      <LayoutGrid className="w-4 h-4" />
+                      <LayoutGrid className="w-3.5 h-3.5" />
                     ) : (
-                      <Table className="w-4 h-4" />
+                      <Table className="w-3.5 h-3.5" />
                     )}
-                    {viewMode === "card" ? "Card" : "Table"}
-                    <ChevronDown className="w-4 h-4" />
+                    {viewMode === "card" ? "Cards" : "Table"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
@@ -290,51 +337,49 @@ export function DashboardContent() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-3 px-4 py-2.5 border border-border rounded-lg bg-background w-80">
-                <Search className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 border border-border/60 dark:border-white/[0.1] rounded-md bg-background dark:bg-white/[0.02] w-64">
+                <Search className="w-3.5 h-3.5 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search by short link or URL"
+                  placeholder="Search links..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+                  className="flex-1 bg-transparent border-none outline-none text-xs placeholder:text-muted-foreground/60"
                 />
               </div>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="w-5 h-5" />
-              </Button>
             </div>
           </div>
 
         {/* Links List */}
         <div className="flex-1 overflow-auto">
+          <div className="max-w-5xl mx-auto">
           {loading ? (
-            <div className="pt-1 px-8 pb-8 space-y-4">
+            <div className="p-6 space-y-3">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-24 bg-muted/30 rounded-lg animate-pulse"
+                  className="h-16 bg-foreground/[0.03] dark:bg-white/[0.03] rounded-md animate-pulse"
                 />
               ))}
             </div>
           ) : filteredUrls.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full py-24">
-              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-5">
-                <Link2 className="w-10 h-10 text-muted-foreground" />
+            <div className="flex flex-col items-center justify-center h-full py-20">
+              <div className="w-14 h-14 rounded-full bg-foreground/[0.05] dark:bg-white/[0.05] flex items-center justify-center mb-4">
+                <Link2 className="w-6 h-6 text-muted-foreground" />
               </div>
-              <h3 className="text-xl font-medium mb-3">
+              <h3 className="text-sm font-medium mb-1">
                 {searchQuery ? "No links found" : "No links yet"}
               </h3>
-              <p className="text-base text-muted-foreground mb-5">
+              <p className="text-xs text-muted-foreground mb-4">
                 {searchQuery
                   ? "Try a different search term"
-                  : "Create your first shortened link to get started"}
+                  : "Create your first shortened link"}
               </p>
               {!searchQuery && (
                 <Link href="/">
-                  <Button size="default" className="gap-2">
-                    <Plus className="w-4 h-4" />
+                  <Button size="sm" className="gap-1.5 h-8 text-xs">
+                    <Plus className="w-3.5 h-3.5" />
                     Create link
                   </Button>
                 </Link>
@@ -343,12 +388,11 @@ export function DashboardContent() {
           ) : (
             <>
               {viewMode === "card" ? (
-                <div className="pt-1 px-8 pb-8 space-y-4">
+                <div className="p-6 space-y-3">
                   {filteredUrls.map((url) => (
                     <div
                       key={url.short_code}
                       onClick={(e) => {
-                        // Don't open analytics if clicking on interactive elements
                         const target = e.target as HTMLElement;
                         if (
                           target.closest('button') ||
@@ -360,115 +404,148 @@ export function DashboardContent() {
                         }
                         handleOpenAnalytics(url);
                       }}
-                      className="flex items-center p-5 border border-border rounded-lg bg-card cursor-pointer
-                        hover:border-foreground/30 hover:shadow-md hover:-translate-y-0.5 
-                        transition-all duration-200 ease-out group"
+                      className="flex items-center px-5 py-4 rounded-lg 
+                        bg-foreground/[0.02] dark:bg-white/[0.025] 
+                        border border-border/40 dark:border-white/[0.06]
+                        hover:border-border dark:hover:border-white/[0.12]
+                        hover:bg-foreground/[0.04] dark:hover:bg-white/[0.04]
+                        cursor-pointer transition-all duration-150 group"
                     >
-                      {/* Left: Favicon + Link Info */}
-                      <div className="flex items-center gap-4 min-w-0 flex-1">
-                        {/* Favicon */}
-                        <div className="w-12 h-12 rounded-full bg-muted dark:bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                          {getFavicon(url.long_url) ? (
-                            <img
-                              src={getFavicon(url.long_url)!}
-                              alt=""
-                              className="w-6 h-6 dark:brightness-90 dark:contrast-125"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <Link2 className="w-5 h-5 text-muted-foreground" />
-                          )}
-                        </div>
+                      {/* Favicon */}
+                      <div className="w-10 h-10 rounded-full bg-foreground/[0.05] dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {getFavicon(url.long_url) ? (
+                          <img
+                            src={getFavicon(url.long_url)!}
+                            alt=""
+                            className="w-5 h-5 dark:opacity-90"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <Link2 className="w-4.5 h-4.5 text-muted-foreground" />
+                        )}
+                      </div>
 
-                        {/* Link Details */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <Link
-                              href={`${shortUrlBase}/${url.short_code}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-base font-medium hover:underline truncate"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {`${shortUrlBase}/${url.short_code}`
-                                .replace(/^https?:\/\//, "")
-                                .replace(/^www\./, "")}
-                            </Link>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopy(url.short_code);
-                              }}
-                              className="p-1 hover:bg-muted rounded transition-colors opacity-0 group-hover:opacity-100"
-                              aria-label="Copy URL"
-                            >
-                              {copied === url.short_code ? (
-                                <Check className="w-4 h-4 text-green-500" />
-                              ) : (
-                                <Copy className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQR(url.short_code);
-                              }}
-                              className="p-1 hover:bg-muted rounded transition-colors opacity-0 group-hover:opacity-100"
-                              aria-label="Show QR Code"
-                            >
-                              <QrCode className="w-4 h-4 text-muted-foreground" />
-                            </button>
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
-                            <span>↳</span>
-                            <span className="truncate max-w-md">
-                              {url.long_url
-                                .replace(/^https?:\/\//, "")
-                                .replace(/^www\./, "")}
+                      {/* Link Details */}
+                      <div className="min-w-0 flex-1 ml-3">
+                        {/* Short URL */}
+                        <div className="flex items-center gap-1.5">
+                          <Link
+                            href={`${shortUrlBase}/${url.short_code}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium hover:underline truncate"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {`${shortUrlBase}/${url.short_code}`
+                              .replace(/^https?:\/\//, "")
+                              .replace(/^www\./, "")}
+                          </Link>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopy(url.short_code);
+                            }}
+                            className="p-1 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors opacity-0 group-hover:opacity-100"
+                            aria-label="Copy URL"
+                          >
+                            {copied === url.short_code ? (
+                              <Check className="w-3.5 h-3.5 text-green-500" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                            )}
+                          </button>
+                        </div>
+                        
+                        {/* Destination URL */}
+                        <div className="mt-0.5">
+                          <span className="text-xs text-muted-foreground/70 truncate block max-w-md">
+                            {url.long_url
+                              .replace(/^https?:\/\//, "")
+                              .replace(/^www\./, "")}
+                          </span>
+                        </div>
+                        
+                        {/* Date + Tags row */}
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="text-[11px] text-muted-foreground">
+                            {formatDate(url.created_at)}
+                          </span>
+                          <span className="text-muted-foreground/30">•</span>
+                          <div className="flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                              marketing
+                            </span>
+                            <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-500/10 text-green-600 dark:text-green-400">
+                              social
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Middle: Date Column */}
-                      <div className="w-28 flex-shrink-0 text-center">
-                        <span className="text-sm text-muted-foreground">
-                          {formatDate(url.created_at)}
-                        </span>
+                      {/* Clicks stat */}
+                      <div className="flex items-center gap-1 px-2.5 py-1 bg-foreground/[0.04] dark:bg-white/[0.06] rounded text-xs flex-shrink-0 mr-2">
+                        <MousePointerClick className="w-3 h-3 text-muted-foreground" />
+                        <span className="font-medium">{url.clicks}</span>
                       </div>
 
-                      {/* Right: Clicks + Actions */}
-                      <div className="flex items-center gap-4 flex-shrink-0">
-                        {/* Clicks badge with bg like homepage */}
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted rounded">
-                          <MousePointerClick className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span className="text-sm font-medium">
-                            {url.clicks} clicks
-                          </span>
-                        </div>
+                      {/* Actions */}
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {/* Share button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopy(url.short_code);
+                          }}
+                          className="p-1.5 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors"
+                          aria-label="Share link"
+                        >
+                          <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
+                        </button>
+                        
+                        {/* QR Code button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQR(url.short_code);
+                          }}
+                          className="p-1.5 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors"
+                          aria-label="Show QR Code"
+                        >
+                          <QrCode className="w-3.5 h-3.5 text-muted-foreground" />
+                        </button>
+
+                        {/* Edit button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Implement edit functionality
+                          }}
+                          className="p-1.5 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors"
+                          aria-label="Edit link"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                        </button>
+                        
+                        {/* More menu */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button
                               onClick={(e) => e.stopPropagation()}
-                              className="p-1.5 hover:bg-muted rounded transition-colors"
+                              className="p-1.5 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors"
                               aria-label="More options"
                               disabled={deleteLoading === url.short_code}
                             >
-                              <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                              <MoreVertical className="w-3.5 h-3.5 text-muted-foreground" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleOpenAnalytics(url)}
-                            >
+                            <DropdownMenuItem onClick={() => handleOpenAnalytics(url)}>
                               <BarChart3 className="w-4 h-4" />
                               View Analytics
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleCopy(url.short_code)}
-                            >
+                            <DropdownMenuItem onClick={() => handleCopy(url.short_code)}>
                               <Copy className="w-4 h-4" />
                               Copy Link
                             </DropdownMenuItem>
@@ -500,11 +577,11 @@ export function DashboardContent() {
                   ))}
                 </div>
               ) : (
-                /* Table View */
-                <div className="pt-1 px-8 pb-8">
-                  <div className="border border-border rounded-lg overflow-hidden">
+              /* Table View */
+                <div className="p-6">
+                  <div className="border border-border/50 dark:border-white/[0.08] rounded-md overflow-hidden">
                     <table className="w-full">
-                      <thead className="bg-muted/50">
+                      <thead className="bg-foreground/[0.02] dark:bg-white/[0.02]">
                         <tr className="text-left text-sm text-muted-foreground">
                           <th className="px-4 py-3 font-medium">Short Link</th>
                           <th className="px-4 py-3 font-medium">Original URL</th>
@@ -513,12 +590,11 @@ export function DashboardContent() {
                           <th className="px-4 py-3 font-medium text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-border">
+                      <tbody className="divide-y divide-border/50 dark:divide-white/[0.06]">
                         {filteredUrls.map((url) => (
                           <tr 
                             key={url.short_code}
                             onClick={(e) => {
-                              // Don't open analytics if clicking on interactive elements
                               const target = e.target as HTMLElement;
                               if (
                                 target.closest('button') ||
@@ -530,16 +606,16 @@ export function DashboardContent() {
                               }
                               handleOpenAnalytics(url);
                             }}
-                            className="hover:bg-muted/30 transition-colors group cursor-pointer"
+                            className="hover:bg-foreground/[0.02] dark:hover:bg-white/[0.02] transition-colors group cursor-pointer"
                           >
                             <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-muted dark:bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-md bg-foreground/[0.05] dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 overflow-hidden">
                                   {getFavicon(url.long_url) ? (
                                     <img
                                       src={getFavicon(url.long_url)!}
                                       alt=""
-                                      className="w-4 h-4 dark:brightness-90 dark:contrast-125"
+                                      className="w-4 h-4 dark:opacity-90"
                                       onError={(e) => {
                                         (e.target as HTMLImageElement).style.display = "none";
                                       }}
@@ -560,7 +636,7 @@ export function DashboardContent() {
                                 </Link>
                                 <button
                                   onClick={() => handleCopy(url.short_code)}
-                                  className="p-1 hover:bg-muted rounded transition-colors opacity-0 group-hover:opacity-100"
+                                  className="p-1 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors opacity-0 group-hover:opacity-100"
                                   aria-label="Copy URL"
                                 >
                                   {copied === url.short_code ? (
@@ -572,7 +648,7 @@ export function DashboardContent() {
                               </div>
                             </td>
                             <td className="px-4 py-3">
-                              <span className="text-sm text-muted-foreground truncate block max-w-xs">
+                              <span className="text-sm text-muted-foreground/70 truncate block max-w-xs">
                                 {url.long_url
                                   .replace(/^https?:\/\//, "")
                                   .replace(/^www\./, "")}
@@ -589,35 +665,31 @@ export function DashboardContent() {
                                 {url.clicks}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right">
+                            <td className="px-4 py-2.5 text-right">
                               <div className="flex items-center justify-end gap-1">
                                 <button
                                   onClick={() => handleQR(url.short_code)}
-                                  className="p-1.5 hover:bg-muted rounded transition-colors opacity-0 group-hover:opacity-100"
+                                  className="p-1 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors opacity-0 group-hover:opacity-100"
                                   aria-label="Show QR Code"
                                 >
-                                  <QrCode className="w-4 h-4 text-muted-foreground" />
+                                  <QrCode className="w-3.5 h-3.5 text-muted-foreground" />
                                 </button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <button
-                                      className="p-1.5 hover:bg-muted rounded transition-colors"
+                                      className="p-1 hover:bg-foreground/[0.06] dark:hover:bg-white/[0.08] rounded transition-colors"
                                       aria-label="More options"
                                       disabled={deleteLoading === url.short_code}
                                     >
-                                      <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                                      <MoreVertical className="w-3.5 h-3.5 text-muted-foreground" />
                                     </button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                      onClick={() => handleOpenAnalytics(url)}
-                                    >
+                                    <DropdownMenuItem onClick={() => handleOpenAnalytics(url)}>
                                       <BarChart3 className="w-4 h-4" />
                                       View Analytics
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleCopy(url.short_code)}
-                                    >
+                                    <DropdownMenuItem onClick={() => handleCopy(url.short_code)}>
                                       <Copy className="w-4 h-4" />
                                       Copy Link
                                     </DropdownMenuItem>
@@ -655,12 +727,13 @@ export function DashboardContent() {
               )}
             </>
           )}
+          </div>
         </div>
 
         {/* Footer */}
         {filteredUrls.length > 0 && (
-          <footer className="flex items-center justify-center px-8 py-4 border-t border-border text-sm text-muted-foreground">
-            Viewing 1-{filteredUrls.length} of {urls.length} links
+          <footer className="flex items-center justify-center px-6 py-3 text-xs text-muted-foreground">
+            Showing {filteredUrls.length} of {urls.length} links
           </footer>
         )}
         </main>
