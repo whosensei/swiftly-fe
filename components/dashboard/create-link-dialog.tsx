@@ -150,10 +150,10 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
       />
       
       {/* Dialog */}
-      <div className="absolute left-1/2 top-[20%] -translate-x-1/2 w-full max-w-xl px-4 animate-in fade-in-0 slide-in-from-top-4 duration-200">
+      <div className="absolute left-1/2 top-[10%] sm:top-[20%] -translate-x-1/2 w-full max-w-xl px-3 sm:px-4 animate-in fade-in-0 slide-in-from-top-4 duration-200">
         <div className="bg-background dark:bg-[#141414] rounded-xl border border-border/50 dark:border-white/[0.08] shadow-2xl overflow-hidden">
           {/* Main Input */}
-          <div className="flex items-center gap-3 px-4 py-3">
+          <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3">
             <div className="w-8 h-8 rounded-full bg-foreground/[0.08] dark:bg-white/[0.08] flex items-center justify-center flex-shrink-0">
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -171,21 +171,22 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
               }}
               onKeyDown={handleKeyDown}
               placeholder="Paste a long URL to shorten..."
-              className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50"
+              className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 min-w-0"
               disabled={loading}
             />
             {url && !loading && (
               <button
                 onClick={handleSubmit}
-                className="px-3 py-1.5 bg-foreground text-background text-xs font-medium rounded-md hover:opacity-90 transition-opacity"
+                className="px-2 sm:px-3 py-1.5 bg-foreground text-background text-xs font-medium rounded-md hover:opacity-90 transition-opacity flex-shrink-0"
               >
-                Shorten
+                <span className="hidden sm:inline">Shorten</span>
+                <span className="sm:hidden">Go</span>
               </button>
             )}
           </div>
 
           {/* Tags Section */}
-          <div className="border-t border-border/50 dark:border-white/[0.06] px-4 py-2.5 flex items-center gap-2">
+          <div className="border-t border-border/50 dark:border-white/[0.06] px-3 sm:px-4 py-2.5 flex items-center gap-2 flex-wrap">
             <Tag className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
             
             {/* Existing Tags */}
@@ -219,7 +220,7 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
                 onKeyDown={handleTagKeyDown}
                 onBlur={handleAddTag}
                 placeholder="Tag name..."
-                className="w-20 bg-transparent border-none outline-none text-[11px] placeholder:text-muted-foreground/50"
+                className="w-20 bg-transparent border-none outline-none text-[11px] placeholder:text-muted-foreground/50 min-w-0"
               />
             ) : tags.length < 5 ? (
               <button
@@ -234,13 +235,13 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
 
           {/* Error */}
           {error && (
-            <div className="border-t border-border/50 dark:border-white/[0.06] px-4 py-2 text-xs text-destructive">
+            <div className="border-t border-border/50 dark:border-white/[0.06] px-3 sm:px-4 py-2 text-xs text-destructive">
               {error}
             </div>
           )}
 
           {/* Footer hint */}
-          <div className="border-t border-border/50 dark:border-white/[0.06] px-4 py-2 flex items-center justify-between text-[11px] text-muted-foreground/60">
+          <div className="border-t border-border/50 dark:border-white/[0.06] px-3 sm:px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-muted-foreground/60">
             <span>Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">Enter</kbd> to create</span>
             <span>Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">Esc</kbd> to close</span>
           </div>

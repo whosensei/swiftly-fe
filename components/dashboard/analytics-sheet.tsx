@@ -381,7 +381,7 @@ export function AnalyticsSheet({ url, open, onOpenChange }: AnalyticsSheetProps)
         ) : (
           <div className="p-4 space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <StatsCard
                 label="Total Clicks"
                 value={totalClicks}

@@ -221,14 +221,14 @@ export function Shorten() {
   }
 
   return (
-    <div className="w-full max-w-xl px-4 font-mono">
+    <div className="w-full max-w-xl px-2 sm:px-4 font-mono">
       <QRCodeDialog
         url={selectedQRUrl}
         open={showQR}
         onOpenChange={setShowQR}
       />
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-3 px-4 py-2.5 shadow-lg border border-border rounded-md flex-1">
+      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2.5 shadow-lg border border-border rounded-md flex-1 min-w-0">
           <Link2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           <input
             type="text"
@@ -236,7 +236,7 @@ export function Shorten() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && HandleShorten()}
-            className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground min-w-0"
           />
         </div>
         <Button
@@ -244,10 +244,13 @@ export function Shorten() {
           disabled={
             loading || !value.trim() || (!session?.user && remainingUrls <= 0)
           }
-          className="px-4 py-2.5 font-medium text-sm h-auto"
+          className="px-2 sm:px-4 py-2.5 font-medium text-sm h-auto whitespace-nowrap flex-shrink-0 w-full sm:w-auto"
         >
           {!loading ? (
-            "Shorten Link"
+            <>
+              <span className="hidden sm:inline">Shorten Link</span>
+              <span className="sm:hidden">Shorten</span>
+            </>
           ) : (
             <Loader className="h-5 w-5 animate-spin" />
           )}

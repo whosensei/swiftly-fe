@@ -6,17 +6,23 @@ import { authClient } from "@/lib/auth-client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
+import { LayoutGrid, Link2 } from "lucide-react";
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setMobileMenuOpen(false);
       }
     }
 
@@ -64,18 +70,19 @@ export function Navbar() {
             </Link>
             
             <div className="flex justify-end items-center h-16">
-              <div className="flex items-center gap-4">
-                <Link href="#features" className="text-sm font-mono text-muted-foreground hover:text-foreground transition-colors">
+              <div className="flex items-center gap-1.5 sm:gap-4">
+                {/* Desktop: Show Features and Dashboard links */}
+                <Link href="#features" className="hidden sm:block text-sm font-mono text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
                   Features
                 </Link>
                 {session?.user && (
-                  <Link href="/dashboard" className="text-sm font-mono text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="/dashboard" className="hidden sm:block text-sm font-mono text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
                     Dashboard
                   </Link>
                 )}
                 <ThemeToggle />
                 {isPending ? (
-                  <div className="w-20 h-9 bg-muted animate-pulse rounded-md"></div>
+                  <div className="w-16 sm:w-20 h-9 bg-muted animate-pulse rounded-md"></div>
                 ) : session?.user ? (
                   <div className="relative" ref={dropdownRef}>
                     <button
@@ -86,19 +93,30 @@ export function Navbar() {
                     </button>
                     
                     {dropdownOpen && (
-                      <div className="absolute left-0 mt-2 w-64 bg-background border border-border rounded-md shadow-lg py-1 z-50">
+                      <div className="absolute right-0 sm:left-0 mt-2 w-64 bg-background border border-border rounded-md shadow-lg py-1 z-50">
                         <div className="px-4 py-3 border-b border-border">
                           <p className="text-sm font-medium">{session.user.name || "User"}</p>
                           <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
                         </div>
                         
-                        {/* <Link
-                          href="/dashboard"
-                          onClick={() => setDropdownOpen(false)}
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"
-                        >
-                          Dashboard
-                        </Link> */}
+                        {/* Mobile: Show Features and Dashboard in dropdown */}
+                        <div className="sm:hidden">
+                          <Link
+                            href="#features"
+                            onClick={() => setDropdownOpen(false)}
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"
+                          >
+                            Features
+                          </Link>
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setDropdownOpen(false)}
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"
+                          >
+                            Dashboard
+                          </Link>
+                          <div className="border-t border-border my-1"></div>
+                        </div>
                         
                         <button
                           onClick={handleSignOut}
@@ -110,11 +128,34 @@ export function Navbar() {
                     )}
                   </div>
                 ) : (
-                  <Link href="/sign-in">
-                    <Button size="sm" className="font-mono">
-                      Sign In
-                    </Button>
-                  </Link>
+                  <>
+                    {/* Mobile: Show Features in a simple dropdown when not logged in */}
+                    <div className="sm:hidden relative" ref={mobileMenuRef}>
+                      <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="w-9 h-9 rounded-md bg-muted hover:bg-muted/80 flex items-center justify-center text-sm font-medium transition-colors"
+                      >
+                        <LayoutGrid className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                      {mobileMenuOpen && (
+                        <div className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-md shadow-lg py-1 z-50">
+                          <Link
+                            href="#features"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors"
+                          >
+                            Features
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                    <Link href="/sign-in" className="sm:block">
+                      <Button size="sm" className="font-mono text-xs sm:text-sm px-2 sm:px-4">
+                        <span className="hidden sm:inline">Sign In</span>
+                        <span className="sm:hidden">Sign In</span>
+                      </Button>
+                    </Link>
+                  </>
                 )}
               </div>
             </div>
